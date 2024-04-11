@@ -19,9 +19,9 @@ TebLocalPlannerROS:
 
 
  # Robot
- max_vel_x: 2 #最大x前向速度 default:0.4 0.01-100.0
+ max_vel_x: 1 #最大x前向速度 default:0.4 0.01-100.0
  max_vel_y: 0 #最大y前向速度，非全向移动小车需要设置为0 default:0.0 0.0-100.0
- max_vel_x_backwards: 2 #最大后退速度 default:0.2 0.01-100.0
+ max_vel_x_backwards: 1 #最大后退速度 default:0.2 0.01-100.0
  max_vel_theta: 0.5  #最大转向角速度 default:0.3 0.01-100.0
  acc_lim_x: 0.5  #最大x向加速度 default:0.5 0.01-100.0
  acc_lim_y: 0  #最大y向加速度，非全向移动小车需要设置为0
