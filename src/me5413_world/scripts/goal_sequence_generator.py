@@ -10,13 +10,28 @@ class GoalSequenceGenerator:
 
         # Define three goal positions
         self.goal_positions = [
-            (6.666267395019531, 1.5673103332519531, 0.002864837646484375),  # First position
-            (7.325674057006836, -6.9588823318481445, 0.0068302154541015625),  # Second position
-            (16.868064880371094, 2.221553325653076, 0.000762939453125)  # Third position
+            (11.495254516601562, 1.9100165367126465, 0.0),  # Point 1
+            (6.666267395019531, 1.5673103332519531, 0.0),   # Point 2
+            (6.78148078918457, -2.5058865547180176, 0.0),   # Point 3
+            (7.325674057006836, -6.9588823318481445, 0.0),  # Point 4
+            (17.293262481689453, -1.5553306341171265, 0.0), # Point 5
+            (16.868064880371094, 2.221553325653076, 0.0)    # Point 6
         ]
 
+        # # Define orientations for each goal position
+        # self.orientations = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+
         # Define orientations for each goal position
-        self.orientations = [1.0, 1.0, -1.0]
+        # Orientations are specified in quaternions: (x, y, z, w)
+        # Orientation for each point: East, North, North, West, South, South
+        self.orientations = [
+            (0.0, 0.0, -0.7071, 0.7071), # Point 1: East
+            (0.0, 0.0, 0.0, 1.0),        # Point 2: North
+            (0.0, 0.0, 0.0, 1.0),        # Point 3: North
+            (0.0, 0.0, 0.7071, 0.7071), # Point 4: West
+            (0.0, 0.0, 1.0, 0.0),       # Point 5: South
+            (0.0, 0.0, 1.0, 0.0)        # Point 6: South
+        ]
 
         # Initialize variables
         self.current_goal_index = 0
@@ -54,7 +69,14 @@ class GoalSequenceGenerator:
         goal.pose.position.x = x
         goal.pose.position.y = y
         goal.pose.position.z = z
-        goal.pose.orientation.w = self.orientations[self.current_goal_index]
+        # goal.pose.orientation.w = self.orientations[self.current_goal_index]
+
+        # Set the orientation
+        orientation = self.orientations[self.current_goal_index]
+        goal.pose.orientation.x = orientation[0]
+        goal.pose.orientation.y = orientation[1]
+        goal.pose.orientation.z = orientation[2]
+        goal.pose.orientation.w = orientation[3]
 
         # Increment the goal index
         self.current_goal_index += 1
