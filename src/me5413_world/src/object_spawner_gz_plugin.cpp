@@ -8,7 +8,6 @@
 
 #include "me5413_world/object_spawner_gz_plugin.hpp"
 
-
 namespace gazebo
 {
 
@@ -23,9 +22,9 @@ void ObjectSpawner::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
   node->Init(_world->Name());
   clt_delete_objects_ = nh_.serviceClient<gazebo_msgs::DeleteModel>("/gazebo/delete_model");
 
-  // // start1
-  // pub_goal_ = nh_.advertise<geometry_msgs::PoseStamped>("/move_base_simple/goal", 1);
-  // // end1
+  // start1
+  pub_goal_ = nh_.advertise<geometry_msgs::PoseStamped>("/move_base_simple/goal", 1);
+  // end1
 
   this->timer_ = nh_.createTimer(ros::Duration(0.1), &ObjectSpawner::timerCallback, this);
   this->pub_factory_ = node->Advertise<msgs::Factory>("~/factory");
@@ -126,12 +125,12 @@ void ObjectSpawner::spawnRandomBoxes(const int num)
     this->box_points.push_back(point);
     const std::string box_name = "number" + std::to_string(i);
     this->box_names.push_back(box_name);
-    // if (i == 1) {
-    //     std::cout << "Box number 1's coordinates are: "
-    //               << "X: " << point.X() 
-    //               << ", Y: " << point.Y() 
-    //               << ", Z: " << point.Z() << std::endl;
-    // }
+    if (i == 1) {
+        std::cout << "Box number 1's coordinates are: "
+                  << "X: " << point.X() 
+                  << ", Y: " << point.Y() 
+                  << ", Z: " << point.Z() << std::endl;
+    }
 
     msgs::Factory box_msg;
     box_msg.set_sdf_filename("model://" + box_name); // TODO: change to our own file
@@ -231,20 +230,24 @@ void ObjectSpawner::respawnCmdCallback(const std_msgs::Int16::ConstPtr& respawn_
   const int cmd = respawn_msg->data;
   if (cmd == 0)
   {
+    ignition::math::Vector3d position_1;
+    position_1 = ignition::math::Vector3d();
+    this->cone_position_ = position_1;
     deleteCone();
     deleteBoxs();
     ROS_INFO_STREAM("Random Objects Cleared!");
   }
   else if (cmd == 1)
   {
+    ignition::math::Vector3d position_1;
+    position_1 = ignition::math::Vector3d();
+    this->cone_position_ = position_1;
     deleteCone();
     deleteBoxs();
+
     spawnRandomCones();
     spawnRandomBoxes(9);
 
-    //start3
-    // spawnRandomGoalPoint();
-    //end3
     ROS_INFO_STREAM("Random Objects Respawned!");
   }
   else
@@ -254,46 +257,6 @@ void ObjectSpawner::respawnCmdCallback(const std_msgs::Int16::ConstPtr& respawn_
 
   return;
 };
-
-
-// //strat2
-// void ObjectSpawner::spawnRandomGoalPoint()
-// {
-//     std::srand(std::time(0) + std::rand()); // 确保随机种子的多样性
-//     ignition::math::Vector3d point;
-//     bool has_collision = true;
-//     while (has_collision)
-//     {
-//         has_collision = false;
-//         point = ignition::math::Vector3d(static_cast<double>(std::rand()) / RAND_MAX * 8.0 + 8,
-//                                          -6.25 + static_cast<double>(std::rand()) / RAND_MAX * 7.25,
-//                                          0.0); // Z坐标保持为0
-
-//         for (const auto& pre_point : this->box_points)
-//         {
-//             if ((point - pre_point).Length() <= 1.2)
-//             {
-//                 has_collision = true;
-//                 break;
-//             }
-//         }
-//     }
-
-//     // 打印生成的点的坐标
-//     ROS_INFO_STREAM("Generated random goal point at: " << point);
-
-//     // 发布目标点
-//     geometry_msgs::PoseStamped goal_msg;
-//     goal_msg.header.stamp = ros::Time::now();
-//     goal_msg.header.frame_id = "map";
-//     goal_msg.pose.position.x = point.X();
-//     goal_msg.pose.position.y = point.Y();
-//     goal_msg.pose.position.z = point.Z(); // Z坐标为0
-//     goal_msg.pose.orientation = tf::createQuaternionMsgFromYaw(0); // 默认朝向
-
-//     pub_goal_.publish(goal_msg);
-// }
-// //end2
 
 
 } // namespace gazebo
