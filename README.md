@@ -1,7 +1,9 @@
 # ME5413_Final_Project
 
 NUS ME5413 Autonomous Mobile Robotics Final Project
-> Authors: [Christina](https://github.com/ldaowen), [Yuhang](https://github.com/yuhang1008), [Dongen](https://github.com/nuslde), and [Shuo](https://github.com/SS47816)
+> Origin Authors: [Christina](https://github.com/ldaowen), [Yuhang](https://github.com/yuhang1008), [Dongen](https://github.com/nuslde), and [Shuo](https://github.com/SS47816)
+
+> Project Group Members: [Yuwei], [Guorong], [Zihan](https://github.com/Zhouzihan13), [Jilun], [Mingrui], and [Peiqi]
 
 ![Ubuntu 20.04](https://img.shields.io/badge/OS-Ubuntu_20.04-informational?style=flat&logo=ubuntu&logoColor=white&color=2bbc8a)
 ![ROS Noetic](https://img.shields.io/badge/Tools-ROS_Noetic-informational?style=flat&logo=ROS&logoColor=white&color=2bbc8a)
@@ -38,15 +40,21 @@ NUS ME5413 Autonomous Mobile Robotics Final Project
   * `jackal_navigation`
   * `velodyne_simulator`
   * `teleop_twist_keyboard`
+  * `cv_bridge`
+  * `teb_local_planner`
+  * `navigation`
+  * `find_object_2d`
 * And this [gazebo_model](https://github.com/osrf/gazebo_models) repositiory
 
 ## Installation
 
 This repo is a ros workspace, containing three rospkgs:
 
+* `add_obstacle_layer` is a plugin to add a custom layer to the costmap
 * `interactive_tools` are customized tools to interact with gazebo and your robot
 * `jackal_description` contains the modified jackal robot model descriptions
 * `me5413_world` the main pkg containing the gazebo world, and the launch files
+
 
 **Note:** If you are working on this project, it is encouraged to fork this repository and work on your own fork!
 
@@ -85,12 +93,21 @@ There are two sources of models needed:
   cp -r ~/gazebo_models/* ~/.gazebo/models
   ```
 
-* [Our customized models](https://github.com/NUS-Advanced-Robotics-Centre/ME5413_Final_Project/tree/main/src/me5413_world/models)
+* [TA‘s customized models](https://github.com/NUS-Advanced-Robotics-Centre/ME5413_Final_Project/tree/main/src/me5413_world/models)
 
   ```bash
   # Copy the customized models into the `~/.gazebo/models` directory
   cp -r ~/ME5413_Final_Project/src/me5413_world/models/* ~/.gazebo/models
   ```
+
+Install the required packages of navigation and template matching:
+```bash
+# Install teb_local_planner
+sudo apt-get install ros-noetic-teb-local-planner
+
+# Install find_object_2d
+sudo apt-get install ros-noetic-find-object-2d
+```
 
 ## Usage
 
@@ -103,20 +120,7 @@ This command will launch the gazebo with the project world
 roslaunch me5413_world world.launch
 ```
 
-### 1. Manual Control
-
-If you wish to explore the gazebo world a bit, we provide you a way to manually control the robot around:
-
-```bash
-# Only launch the robot keyboard teleop control
-roslaunch me5413_world manual.launch
-```
-
-**Note:** This robot keyboard teleop control is also included in all other launch files, so you don't need to launch this when you do mapping or navigation.
-
-![rviz_manual_image](src/me5413_world/media/rviz_manual.png)
-
-### 2. Mapping
+### 1. Mapping
 
 After launching **Step 0**, in the second terminal:
 
@@ -133,48 +137,40 @@ roscd me5413_world/maps/
 rosrun map_server map_saver -f my_map map:=/map
 ```
 
-![rviz_nmapping_image](src/me5413_world/media/rviz_mapping.png)
 
-### 3. Navigation
+### 2. Navigation
 
-Once completed **Step 2** mapping and saved your map, quit the mapping process.
+After completing the mapping task and saving the map, quit all processes and modify the name of the map called in file `navigation_test.launch` accordingly. 
+
+To make sure the script works, you first need to grant permissions to the two Python scripts in the scripts folder：
+```bash
+# Give permision to the scripts
+cd ~/ME5413_Final_Project/src/me5413_world/scripts
+chmod +x object_position_publisher.py
+chmod +x goal_sequence_generator.py
+```
+
+You can now officially run the navigation node, in the first terminal：
+```bash
+# Launch Gazebo World together with our robot
+roslaunch me5413_world world.launch
+```
+
 
 Then, in the second terminal:
 
 ```bash
 # Load a map and launch AMCL localizer
-roslaunch me5413_world navigation.launch
+roslaunch me5413_world navigation_test.launch
 ```
 
-![rviz_navigation_image](src/me5413_world/media/rviz_navigation.png)
+![rviz_navigation_image](src/me5413_world/media/our_initial.png)
 
-## Student Tasks
+Robot uses template matching nodes to search and navigate to the target box：
+![rviz_navigation_image](src/me5413_world/media/our_box_searching.gif)
+![rviz_navigation_image](src/me5413_world/media/our_box_matching.gif)
 
-### 1. Map the environment
 
-* You may use any SLAM algorithm you like, any type:
-  * 2D LiDAR
-  * 3D LiDAR
-  * Vision
-  * Multi-sensor
-* Verify your SLAM accuracy by comparing your odometry with the published `/gazebo/ground_truth/state` topic (`nav_msgs::Odometry`), which contains the gournd truth odometry of the robot.
-* You may want to use tools like [EVO](https://github.com/MichaelGrupp/evo) to quantitatively evaluate the performance of your SLAM algorithm.
-
-### 2. Using your own map, navigate your robot
-
-* From the starting point, move to the given pose within each area in sequence
-  * Assembly Line 1, 2
-  * Random Box 1, 2, 3, 4
-  * Delivery Vehicle 1, 2, 3
-* We have provided you a GUI in RVIZ that allows you to click and publish these given goal poses to the `/move_base_simple/goal` topic:
-  
-  ![rviz_panel_image](src/me5413_world/media/rviz_panel.png)
-
-* We also provides you four topics (and visualized in RVIZ) that computes the real-time pose error between your robot and the selelcted goal pose:
-  * `/me5413_world/absolute/heading_error` (in degrees, wrt `world` frame, `std_msgs::Float32`)
-  * `/me5413_world/absolute/position_error` (in meters, wrt `world` frame, `std_msgs::Float32`)
-  * `/me5413_world/relative/heading_error` (in degrees, wrt `map` frame, `std_msgs::Float32`)
-  * `/me5413_world/relative/position_error` (in meters wrt `map` frame, `std_msgs::Float32`)
 
 ## Contribution
 
@@ -185,6 +181,15 @@ We are following:
 * [Google C++ Style Guide](https://google.github.io/styleguide/cppguide.html),
 * [C++ Core Guidelines](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#main),
 * [ROS C++ Style Guide](http://wiki.ros.org/CppStyleGuide)
+
+
+## Acknowledgements
+We thank Prof. Marcelo and the teaching assistants for their guidance and assistance. We used a lot of ROS open source code in our project and would like to express our gratitude to their authors.
+* [Cartographer](https://github.com/cartographer-project/cartographer): A collection of mapping algorithms implemented in C++ by Google.
+* [FAST-LIO](https://github.com/hku-mars/FAST_LIO): A computationally efficient and robust LiDAR-inertial odometry package by hku-mars group.
+* [A-LOAM](https://github.com/AtsushiSakai/PythonRobotics): A collection of robotics algorithms implemented in Python.
+* [find_object_2d](https://github.com/introlab/find-object): An integrated visual algorithm library for easy object detection.
+
 
 ## License
 
