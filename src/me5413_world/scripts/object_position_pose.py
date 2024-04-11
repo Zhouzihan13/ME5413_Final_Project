@@ -5,8 +5,7 @@ from geometry_msgs.msg import Pose
 from geometry_msgs.msg import PoseStamped
 
 def object_position_pose(t,o):
-    #话题名为： objection_position_pose，
-    #后面订阅这个话题时要使用这个名字
+    # topic name： objection_position_pose
     pub = rospy.Publisher('/objection_position_pose',Pose,queue_size=10)
     p = Pose()
     rate = rospy.Rate(5)
@@ -33,7 +32,7 @@ def main():
     rospy.init_node('tf_listener',anonymous=True)
     listener = tf.TransformListener()
     rate = rospy.Rate(10.0)
-    rospy.Subscriber('/objection_position_pose', Pose, callback)  # 添加订阅者
+    rospy.Subscriber('/objection_position_pose', Pose, callback)  # add subscriber
     while not rospy.is_shutdown():
         try:
             (trans,rot) = listener.lookupTransform('/map', '/object_1', rospy.Time(0))
@@ -49,8 +48,8 @@ def main():
 # def main():
 #     rospy.init_node('tf_listener', anonymous=True)
 #     listener = tf.TransformListener()
-#     rospy.Subscriber('/objection_position_pose', Pose, callback)  # 添加订阅者
-#     rospy.spin()  # 让节点保持运行
+#     rospy.Subscriber('/objection_position_pose', Pose, callback)  # add subscriber
+#     rospy.spin()  # keep node running
 
 if __name__ == '__main__':
     main()
