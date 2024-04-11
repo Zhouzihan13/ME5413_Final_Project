@@ -31,4 +31,6 @@
 
   <!-- Add a static world frame -->
   <!-- <node pkg="tf2_ros" type="static_transform_publisher" name="world_broadcast" args="0 0 0 0 0 0 1 world odom" /> -->
+  
+  <node pkg="tf2_ros" type="static_transform_publisher" name="static_transform_publisher" args="0 0 0 -1.57 0 -1.57 /depth_camera_link /depth_pointcloud_link" />
 </launch>

@@ -31,6 +31,14 @@
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <visualization_msgs/MarkerArray.h>
 
+// ------------------------------------------------
+// // Add some lib
+// #include <cmath>
+// #include <mutex>
+// #include <actionlib_msgs/GoalStatusArray.h>
+// #include <nav_msgs/OccupancyGrid.h>
+// ------------------------------------------------
+
 namespace me5413_world 
 {
 
@@ -48,6 +56,15 @@ class GoalPublisherNode
   void boxMarkersCallback(const visualization_msgs::MarkerArray::ConstPtr& box_markers);
   
   tf2::Transform convertPoseToTransform(const geometry_msgs::Pose& pose);
+  
+  // ------------------------------------------------
+  // void globalCostmapCallback(const nav_msgs::OccupancyGrid::ConstPtr& msg);
+  // bool isPointInObstacle(double x, double y);
+  // void moveBaseStatusCallback(const actionlib_msgs::GoalStatusArray& status);
+  // geometry_msgs::PoseStamped getRandomTargetInPackingArea();
+  // void calculatedTargetCallback(const geometry_msgs::PoseStamped& target);
+  // ------------------------------------------------
+  
   geometry_msgs::PoseStamped getGoalPoseFromConfig(const std::string& name);
   std::pair<double, double> calculatePoseError(const geometry_msgs::Pose& pose_robot, const geometry_msgs::Pose& pose_goal);
 
@@ -65,6 +82,19 @@ class GoalPublisherNode
   ros::Subscriber sub_goal_name_;
   ros::Subscriber sub_goal_pose_;
   ros::Subscriber sub_box_markers_;
+
+  // ------------------------------------------------
+  // // Add some subscriber nodes for searching box
+  // ros::Subscriber sub_map_;
+  // ros::Subscriber sub_move_base_status_;
+  // ros::Subscriber sub_calculated_target_;
+
+  // ros::Time last_goal_time_;
+  // std::string last_responded_goal_id_;
+  // nav_msgs::OccupancyGrid globalCostmapData;
+  // geometry_msgs::PoseStamped gt_box_pose;
+  // geometry_msgs::PoseStamped calculated_target_;
+  // ------------------------------------------------
 
   tf2_ros::Buffer tf2_buffer_;
   tf2_ros::TransformListener tf2_listener_;

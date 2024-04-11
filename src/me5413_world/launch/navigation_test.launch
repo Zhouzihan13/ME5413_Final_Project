@@ -1,0 +1,55 @@
+<launch>
+
+  <!-- Connect the robot to a keyboard teleop controller -->
+  <node name="teleop_twist_keyboard" pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" output="screen" respawn="true"/>
+
+  <!-- Run the map server -->
+  <arg name="map_file" default="$(find me5413_world)/maps/yourimage.yaml"/>
+  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
+  
+  <!-- Launch the AMCL Localizer -->
+  <include file="$(find me5413_world)/my_navigation/launch/include/amcl.launch" />
+
+  <!-- Launch Move Base -->
+  <include file="$(find me5413_world)/my_navigation/launch/include/move_base.launch" />  
+  
+  <!-- find_object_2d -->
+  <!-- <node name="find_object_2d" pkg="find_object_2d" type="find_object_2d" output="screen">
+		<remap from="image" to="/front/left/image_raw"/>
+		<param name="gui" value="true" type="bool"/>
+		<param name="objects_path" value="$(find me5413_world)/objects/" type="str"/>
+		<param name="settings_path" value="~/.ros/find_object_2d.ini" type="str"/>
+  </node> -->
+  
+  <!-- find_object_3d -->
+  <node name="find_object_3d" pkg="find_object_2d" type="find_object_2d" output="screen">
+		<param name="gui" value="true" type="bool"/>
+		<param name="settings_path" value="~/.ros/find_object_2d.ini" type="str"/>
+		<param name="subscribe_depth" value="true" type="bool"/>
+		<param name="objects_path" value="$(find me5413_world)/objects" type="str"/>
+		<param name="object_prefix" value="object" type="str"/>
+		
+		<remap from="rgb/image_rect_color" to="/depthcamera/rgb/image_raw"/>
+		<remap from="depth_registered/image_raw" to="/depthcamera/depth/image_raw"/>
+		<remap from="depth_registered/camera_info" to="/depthcamera/rgb/camera_info"/>
+  </node>
+  
+  <!-- Get matched box position and pose -->
+  <!-- <node pkg="me5413_world" type="object_position_pose.py" name="object_position_pose" output="screen" /> -->
+  <node pkg="me5413_world" type="object_position_publisher.py" name="object_position_publisher" output="screen" />
+
+  <!-- Start the random goal generator node -->
+  <!-- <node pkg="me5413_world" type="random_goal_generator.py" name="random_goal_generator" output="screen"/> -->
+  <!-- <node pkg="me5413_world" type="navigation_to_box.py" name="random_goal_publisher" output="screen" /> -->
+
+  <!-- Start the goal sequence publisher node -->
+  <node pkg="me5413_world" type="goal_sequence_generator.py" name="goal_sequence_generator" output="screen"/>
+
+
+  <!-- Launch Rviz with our settings -->
+  <node type="rviz" name="rviz" pkg="rviz" args="-d $(find me5413_world)/rviz/navigation.rviz" output="log" respawn="true"/>
+	
+  <node ns="me5413_world" pkg="me5413_world" type="goal_publisher_node" name="goal_publisher_node" output="screen" />
+
+
+</launch>

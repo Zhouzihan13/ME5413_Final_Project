@@ -1,0 +1,5 @@
+<library path="lib/libadd_obstacle_layer">
+  <class  type="add_layer_namespace::AddObstacleLayer" base_class_type="costmap_2d::Layer">
+    <description>A custom costmap layer that add two obstacles.</description>
+  </class>
+</library>

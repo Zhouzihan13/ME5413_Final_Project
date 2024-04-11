@@ -5,6 +5,10 @@
  * Gazebo Plugin for spawning objects
  
 **/
+#include <tf/transform_broadcaster.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+
+#include <geometry_msgs/PoseStamped.h>
 
 #include <ctime>
 #include <cstdlib>
@@ -33,6 +37,7 @@ class ObjectSpawner : public WorldPlugin
   ignition::math::Vector3d cone_point;
   std::vector<std::string> box_names;
   std::vector<ignition::math::Vector3d> box_points;
+  ignition::math::Vector3d cone_position_; // Add a member variable to store the cone position
 
   ObjectSpawner();
   virtual ~ObjectSpawner();
@@ -45,6 +50,12 @@ class ObjectSpawner : public WorldPlugin
   ros::ServiceClient clt_delete_objects_;
   ros::Subscriber sub_respawn_objects_;
   ros::Publisher pub_rviz_markers_;
+  ros::Publisher pub_cone_position_; // Add a publisher member variable
+
+  //start1
+  ros::Publisher pub_goal_;
+  //end1
+
 
   visualization_msgs::MarkerArray box_markers_msg_;
   
@@ -55,6 +66,7 @@ class ObjectSpawner : public WorldPlugin
   void deleteCone();
   void deleteBoxs();
   void respawnCmdCallback(const std_msgs::Int16::ConstPtr& respawn_msg);
+  void spawnRandomGoalPoint();
 };
 
 // Register this plugin with the simulator

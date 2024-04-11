@@ -8,6 +8,7 @@
 
 #include "me5413_world/object_spawner_gz_plugin.hpp"
 
+
 namespace gazebo
 {
 
@@ -21,10 +22,16 @@ void ObjectSpawner::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
   transport::NodePtr node(new transport::Node());
   node->Init(_world->Name());
   clt_delete_objects_ = nh_.serviceClient<gazebo_msgs::DeleteModel>("/gazebo/delete_model");
+
+  // // start1
+  // pub_goal_ = nh_.advertise<geometry_msgs::PoseStamped>("/move_base_simple/goal", 1);
+  // // end1
+
   this->timer_ = nh_.createTimer(ros::Duration(0.1), &ObjectSpawner::timerCallback, this);
   this->pub_factory_ = node->Advertise<msgs::Factory>("~/factory");
   this->sub_respawn_objects_ = nh_.subscribe("/rviz_panel/respawn_objects", 1, &ObjectSpawner::respawnCmdCallback, this);
   this->pub_rviz_markers_ = nh_.advertise<visualization_msgs::MarkerArray>("/gazebo/ground_truth/box_markers", 0);
+  this->pub_cone_position_ = nh_.advertise<geometry_msgs::Point>("/gazebo/cone_position", 1);  //Initialize the publisher
   
   return;
 };
@@ -33,6 +40,13 @@ void ObjectSpawner::timerCallback(const ros::TimerEvent&)
 {
   // publish rviz markers
   this->pub_rviz_markers_.publish(this->box_markers_msg_);
+
+  // Continuously Publish the cone position
+  geometry_msgs::Point cone_msg;
+  cone_msg.x = this->cone_position_.X();
+  cone_msg.y = this->cone_position_.Y();
+  cone_msg.z = this->cone_position_.Z();
+  this->pub_cone_position_.publish(cone_msg);
 
   return;
 };
@@ -45,19 +59,29 @@ void ObjectSpawner::spawnRandomCones()
   cone_msg.set_sdf_filename("model://construction_cone");
 
   std::srand(std::time(0));
+
+  ignition::math::Vector3d position; // Declare the position variable
+
   if (std::rand() % 2 == 0)
   {
     msgs::Set(cone_msg.mutable_pose(), ignition::math::Pose3d(
                 ignition::math::Vector3d(12.7, 2.5, 0.1),
                 ignition::math::Quaterniond(0, 0, 0)));
+    position = ignition::math::Vector3d(12.7, 2.5, 0.1);  // Set the position variable
   }
   else
   {
     msgs::Set(cone_msg.mutable_pose(), ignition::math::Pose3d(
                 ignition::math::Vector3d(16.9, 2.5, 0.1),
                 ignition::math::Quaterniond(0, 0, 0)));
+    position = ignition::math::Vector3d(16.9, 2.5, 0.1);  // Set the position variable
   }
   this->pub_factory_->Publish(cone_msg);
+  
+  // Update the cone position member variable
+  this->cone_position_ = position;
+
+  
   
   return;
 };
@@ -102,6 +126,12 @@ void ObjectSpawner::spawnRandomBoxes(const int num)
     this->box_points.push_back(point);
     const std::string box_name = "number" + std::to_string(i);
     this->box_names.push_back(box_name);
+    // if (i == 1) {
+    //     std::cout << "Box number 1's coordinates are: "
+    //               << "X: " << point.X() 
+    //               << ", Y: " << point.Y() 
+    //               << ", Z: " << point.Z() << std::endl;
+    // }
 
     msgs::Factory box_msg;
     box_msg.set_sdf_filename("model://" + box_name); // TODO: change to our own file
@@ -211,6 +241,10 @@ void ObjectSpawner::respawnCmdCallback(const std_msgs::Int16::ConstPtr& respawn_
     deleteBoxs();
     spawnRandomCones();
     spawnRandomBoxes(9);
+
+    //start3
+    // spawnRandomGoalPoint();
+    //end3
     ROS_INFO_STREAM("Random Objects Respawned!");
   }
   else
@@ -220,5 +254,46 @@ void ObjectSpawner::respawnCmdCallback(const std_msgs::Int16::ConstPtr& respawn_
 
   return;
 };
+
+
+// //strat2
+// void ObjectSpawner::spawnRandomGoalPoint()
+// {
+//     std::srand(std::time(0) + std::rand()); // 确保随机种子的多样性
+//     ignition::math::Vector3d point;
+//     bool has_collision = true;
+//     while (has_collision)
+//     {
+//         has_collision = false;
+//         point = ignition::math::Vector3d(static_cast<double>(std::rand()) / RAND_MAX * 8.0 + 8,
+//                                          -6.25 + static_cast<double>(std::rand()) / RAND_MAX * 7.25,
+//                                          0.0); // Z坐标保持为0
+
+//         for (const auto& pre_point : this->box_points)
+//         {
+//             if ((point - pre_point).Length() <= 1.2)
+//             {
+//                 has_collision = true;
+//                 break;
+//             }
+//         }
+//     }
+
+//     // 打印生成的点的坐标
+//     ROS_INFO_STREAM("Generated random goal point at: " << point);
+
+//     // 发布目标点
+//     geometry_msgs::PoseStamped goal_msg;
+//     goal_msg.header.stamp = ros::Time::now();
+//     goal_msg.header.frame_id = "map";
+//     goal_msg.pose.position.x = point.X();
+//     goal_msg.pose.position.y = point.Y();
+//     goal_msg.pose.position.z = point.Z(); // Z坐标为0
+//     goal_msg.pose.orientation = tf::createQuaternionMsgFromYaw(0); // 默认朝向
+
+//     pub_goal_.publish(goal_msg);
+// }
+// //end2
+
 
 } // namespace gazebo

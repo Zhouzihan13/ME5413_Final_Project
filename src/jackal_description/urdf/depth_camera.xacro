@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://wiki.ros.org/xacro">
+<xacro:property name="PI" value="3.141592653589793" />
+    <link name="depth_camera_link">
+      <visual>
+    <origin xyz="0 0 0" rpy="0 0 0" />
+    <geometry>
+      <mesh filename="package://jackal_description/meshes/kinect_mount.stl" />
+    </geometry>
+    <material name="black" />
+  </visual>
+  <collision>
+    <origin xyz="0 0 0" rpy="0 0 0" />
+    <geometry>
+      <mesh filename="package://jackal_description/meshes/kinect_mount.stl" />
+    </geometry>
+  </collision>
+    </link>
+    
+  <joint name="depth_camera_joint" type="fixed">
+    <parent link="base_link" />
+    <child link="depth_camera_link" />
+    <origin xyz="0.2 0 0.5" rpy="0 0 0" />
+  </joint>
+
+  
+ 
+</robot>

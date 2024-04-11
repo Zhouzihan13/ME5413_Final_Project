@@ -1,0 +1,33 @@
+<launch>
+
+  <!-- Connect the robot to a keyboard teleop controller -->
+  <node name="teleop_twist_keyboard" pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" output="screen" respawn="true"/>
+
+  <!-- Run the map server -->
+  <!-- <arg name="map_file" default="$(find me5413_world)/maps/my_map_karto.yaml"/> -->
+  <arg name="map_file" default="$(find me5413_world)/maps/yourimage.yaml"/>
+  <!-- <arg name="map_file" default="$(find me5413_world)/maps/aloam.yaml"/> -->
+  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
+  
+  <!-- Launch the AMCL Localizer -->
+  <include file="$(find me5413_world)/my_navigation/launch/include/amcl.launch" />
+
+  <!-- Launch Move Base -->
+  <include file="$(find me5413_world)/my_navigation/launch/include/move_base.launch" />
+
+  <!-- Launch Rviz with our settings -->
+  <node type="rviz" name="rviz" pkg="rviz" args="-d $(find me5413_world)/rviz/navigation.rviz" output="log" respawn="true"/>
+
+  <node ns="me5413_world" pkg="me5413_world" type="goal_publisher_node" name="goal_publisher_node" output="screen" />
+
+    <node name="find_object_2d" pkg="find_object_2d" type="find_object_2d" output="screen">
+		<remap from="image" to="/front/left/image_raw"/>
+		<param name="gui" value="true" type="bool"/>
+		<param name="objects_path" value="~/ME5413_Final_Project/src/me5413_world/objects" type="str"/>
+		<param name="settings_path" value="~/.ros/find_object_2d.ini" type="str"/>
+  </node>
+
+  <!-- <node pkg="me5413_world" type="detector.py" name="Detector" output="screen" /> -->
+  <!-- <node pkg="me5413_world" type="roi_coordinate_calculator.py" name="ROICoordinateCalculator" output="screen" /> -->
+  <!-- <node pkg="me5413_world" type="viz.py" name="ObjectDetector" output="screen" /> -->
+</launch>
