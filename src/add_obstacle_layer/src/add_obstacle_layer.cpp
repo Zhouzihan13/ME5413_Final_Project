@@ -79,9 +79,7 @@ void AddObstacleLayer::conePositionCallback(const geometry_msgs::Point::ConstPtr
 
 void AddObstacleLayer::respawnCallback(const std_msgs::Int16::ConstPtr& respawn_msg)
 {
-  if(respawn_msg->data == 0) {
-    clearSpecificObstacles();
-  }
+  clearSpecificObstacles();
 }
 
 void AddObstacleLayer::reconfigureCB(costmap_2d::GenericPluginConfig &config, uint32_t level)
