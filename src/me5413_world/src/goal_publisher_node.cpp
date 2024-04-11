@@ -33,7 +33,6 @@ GoalPublisherNode::GoalPublisherNode() : tf2_listener_(tf2_buffer_)
   this->absolute_heading_error_.data = 0.0;
   this->relative_position_error_.data = 0.0;
   this->relative_heading_error_.data = 0.0;
-
 };
 
 void GoalPublisherNode::timerCallback(const ros::TimerEvent&)
@@ -97,7 +96,6 @@ void GoalPublisherNode::goalNameCallback(const std_msgs::String::ConstPtr& name)
   const int goal_box_id = stoi(goal_name.substr(end+1, 1));
 
   geometry_msgs::PoseStamped P_world_goal;
-  // goal_type=='box' means that we is heading to the box 
   if (this->goal_type_ == "box")
   {
     if (box_poses_.empty())
@@ -110,6 +108,8 @@ void GoalPublisherNode::goalNameCallback(const std_msgs::String::ConstPtr& name)
       ROS_ERROR_STREAM("Box id is outside the available range, please select a smaller id!");
       return;
     }
+
+    P_world_goal = box_poses_[goal_box_id - 1];
   }
   else
   {
@@ -139,18 +139,14 @@ void GoalPublisherNode::goalNameCallback(const std_msgs::String::ConstPtr& name)
   // Transform the robot pose to map frame
   tf2::doTransform(this->pose_world_robot_, this->pose_map_robot_, transform_map_world);
 
-  // ------------------------------------------------
   // Publish goal pose in map frame 
   if (this->goal_type_ != "box")
   {
     this->pub_goal_.publish(P_map_goal);
   }
-  // ------------------------------------------------
 
-  
   return;
 };
-
 
 void GoalPublisherNode::goalPoseCallback(const geometry_msgs::PoseStamped::ConstPtr& goal_pose)
 {
@@ -180,8 +176,6 @@ void GoalPublisherNode::boxMarkersCallback(const visualization_msgs::MarkerArray
 
   return;
 };
-
-
 
 geometry_msgs::PoseStamped GoalPublisherNode::getGoalPoseFromConfig(const std::string& name)
 {
