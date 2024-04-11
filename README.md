@@ -13,6 +13,7 @@ NUS ME5413 Autonomous Mobile Robotics Final Project
 ![GitHub Repo forks](https://img.shields.io/github/forks/NUS-Advanced-Robotics-Centre/ME5413_Final_Project?color=FFE333)
 
 ![cover_image](src/me5413_world/media/gazebo_world.png)
+[![Autonomous Navigation of Jackal Robot to Complete Route Tasks in Gazebo](https://img.youtube.com/vi/Al2n14IdqJw/2.jpg)](https://www.youtube.com/watch?v=Al2n14IdqJw)
 
 ## Dependencies
 
