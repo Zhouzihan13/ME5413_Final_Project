@@ -17,6 +17,9 @@ class ObjectPositionPublisher:
 
         # -------------------
         self.match_counter = 0  # Counter for consecutive matches
+        self.adjust_interval = 3  # Consecutive matches interval in frames
+        self.adjust_count = 0  # Counter for adjusting
+        self.adjust_frequency = 5 # Adjust interval in frames
         # -------------------
 
         self.rate = rospy.Rate(10.0)
@@ -32,8 +35,12 @@ class ObjectPositionPublisher:
             self.match_counter += 1  # Match received, increment the counter
         else:
             self.match_counter = 0  # No match, reset the counter
-        if self.match_counter >= 5:  # Consecutive matches reached 6 frames
+        # if self.match_counter >= 5:  # Consecutive matches reached 6 frames
+        #     self.send_goal(pose)
+        if self.match_counter >= self.adjust_interval:  # Consecutive matches reached adjust interval
+            self.match_counter = 0  # Reset the match counter
             self.send_goal(pose)
+            self.adjust_count = 0  # Reset the adjust counter
 
     def send_goal(self, pose):
         
@@ -95,6 +102,16 @@ class ObjectPositionPublisher:
 
     def goal_callback(self, goal):
         rospy.loginfo("Received goal: {}".format(goal))
+    
+
+    def adjust_goal(self):
+        if self.adjust_counter >= self.adjust_frequency:
+            if self.objection_position_received:
+                self.send_goal(self.current_goal)
+            else:
+                rospy.loginfo("No objection position detected. Maintaining current goal.")
+            self.adjust_counter = 0
+
 
     def run(self):
         while not rospy.is_shutdown():
@@ -113,6 +130,13 @@ class ObjectPositionPublisher:
                     pose.pose.orientation.w = rot[3]
                     self.send_goal(pose)
                     self.objection_position_received = True
+                elif self.current_goal is not None:
+                    # Adjust the current goal pose while the objection position is received
+                    self.adjust_goal()
+                else:
+                    rospy.loginfo("No current goal. Waiting for the next objection position.")
+                    self.objection_position_received = False  # Reset the flag to wait for the next objection position
+
             except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
                 rospy.logerr("Failed to lookup obstacle position")
             self.rate.sleep()
