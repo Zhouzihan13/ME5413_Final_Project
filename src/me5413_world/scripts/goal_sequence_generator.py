@@ -10,11 +10,11 @@ class GoalSequenceGenerator:
 
         # Define three goal positions
         self.goal_positions = [
-            (11.495254516601562, 1.9100165367126465, 0.0),  # Point 1
+            # (11.495254516601562, 1.9100165367126465, 0.0),  # Point 1
             (6.666267395019531, 1.5673103332519531, 0.0),   # Point 2
             (6.78148078918457, -2.5058865547180176, 0.0),   # Point 3
-            (7.325674057006836, -6.9588823318481445, 0.0),  # Point 4
-            (17.293262481689453, -1.5553306341171265, 0.0), # Point 5
+            (13.325674057006836, -4.9588823318481445, 0.0),  # Point 4
+            # (17.293262481689453, -1.5553306341171265, 0.0), # Point 5
             (16.868064880371094, 2.221553325653076, 0.0)    # Point 6
         ]
 
@@ -25,11 +25,11 @@ class GoalSequenceGenerator:
         # Orientations are specified in quaternions: (x, y, z, w)
         # Orientation for each point: East, North, North, West, South, South
         self.orientations = [
-            (0.0, 0.0, -0.7071, 0.7071), # Point 1: East
+            # (0.0, 0.0, -0.7071, 0.7071), # Point 1: East
             (0.0, 0.0, 0.0, 1.0),        # Point 2: North
             (0.0, 0.0, 0.0, 1.0),        # Point 3: North
             (0.0, 0.0, 0.7071, 0.7071), # Point 4: West
-            (0.0, 0.0, 1.0, 0.0),       # Point 5: South
+            # (0.0, 0.0, 1.0, 0.0),       # Point 5: South
             (0.0, 0.0, 1.0, 0.0)        # Point 6: South
         ]
 
@@ -51,6 +51,8 @@ class GoalSequenceGenerator:
         if msg.status.status == 3 and self.current_goal_index < len(self.goal_positions):
             # Update goal reached flag
             self.goal_reached = True
+            # # Cancel the following goals if the current goal is reached
+            # self.continue_sequence = False
 
     def goal_callback(self, goal):
         rospy.loginfo("Received goal: {}".format(goal))
@@ -109,6 +111,25 @@ class GoalSequenceGenerator:
                 else:
                     rospy.loginfo("All goals have been reached or sequence stopped..")
             rate.sleep()
+
+    # def run(self):
+    #     rate = rospy.Rate(1)  # 1 Hz
+    #     while not rospy.is_shutdown():
+    #         # Check if the current goal has been reached
+    #         if self.goal_reached:
+    #             # Generate the next goal
+    #             next_goal = self.generate_next_goal()
+    #             if next_goal is not None:
+    #                 # Publish the next goal
+    #                 self.pub_goal.publish(next_goal)
+    #                 rospy.loginfo("Published next goal.")
+    #                 # Reset goal reached flag
+    #                 self.goal_reached = False
+    #                 # Reset continue_sequence flag
+    #                 self.continue_sequence = True
+    #             else:
+    #                 rospy.loginfo("All goals have been reached or sequence stopped..")
+    #         rate.sleep()
 
 if __name__ == '__main__':
     try:
