@@ -3,7 +3,7 @@
 NUS ME5413 Autonomous Mobile Robotics Final Project
 > Origin Authors: [Christina](https://github.com/ldaowen), [Yuhang](https://github.com/yuhang1008), [Dongen](https://github.com/nuslde), and [Shuo](https://github.com/SS47816)
 
-> Project Group Members: [Yuwei], [Guorong](https://github.com/z492x), [Zihan](https://github.com/Zhouzihan13), [Jilun], [Mingrui], and [Peiqi](https://github.com/peiqizhao)
+> Project Group Members: Yuwei, [Guorong](https://github.com/z492x), [Zihan](https://github.com/Zhouzihan13), Jilun, Mingrui, and [Peiqi](https://github.com/peiqizhao)
 
 ![Ubuntu 20.04](https://img.shields.io/badge/OS-Ubuntu_20.04-informational?style=flat&logo=ubuntu&logoColor=white&color=2bbc8a)
 ![ROS Noetic](https://img.shields.io/badge/Tools-ROS_Noetic-informational?style=flat&logo=ROS&logoColor=white&color=2bbc8a)
