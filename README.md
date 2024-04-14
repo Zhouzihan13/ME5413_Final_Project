@@ -128,6 +128,10 @@ After launching **Step 0**, in the second terminal:
 ```bash
 # Launch GMapping
 roslaunch me5413_world mapping.launch
+# or launch Cartographer
+roslaunch me5413_world cartographer.launch
+# or launch Fast-lio
+roslaunch fast_lio mapping_velodyne.launch
 ```
 
 After finishing mapping, run the following command in the thrid terminal to save the map:
